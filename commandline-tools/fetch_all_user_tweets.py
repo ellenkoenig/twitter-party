@@ -14,8 +14,6 @@ auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
                            CONSUMER_KEY, CONSUMER_SECRET)
 
 twitter_api = twitter.Twitter(domain = 'api.twitter.com', api_version = '1.1', auth = auth, format = 'json')
-posts = twitter_api.statuses.user_timeline(count = '200') () #does not fetch retweeets right now, set included_rts = true if needed
+posts = twitter_api.statuses.user_timeline(count = '200') #does not fetch retweeets right now, set included_rts = true if needed
 
-print json.dumps(posts, indent = 1)
-	
-                          
+tweets = [ipost['text'] for ipost in posts]                     
