@@ -10,7 +10,7 @@ auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
                            CONSUMER_KEY, CONSUMER_SECRET)
 
 twitter_api = twitter.Twitter(domain = 'api.twitter.com', api_version = '1.1', auth = auth, format = 'json')
-profile = twitter_api.users.show(screen_name='ellen_koenig')
+profile = twitter_api.account.verify_credentials()
 location = profile['location']
 
 print location
