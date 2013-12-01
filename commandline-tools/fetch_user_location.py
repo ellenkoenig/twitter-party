@@ -1,9 +1,5 @@
-#! /usr/bin/env python
-# -*- coding: iso-8859-15 -*-
-          
-import twitter
 import os
-import json
+import twitter
 
 CONSUMER_KEY = os.environ['tw_pg_consumerkey']
 CONSUMER_SECRET = os.environ['tw_pg_consumer']
@@ -14,8 +10,7 @@ auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
                            CONSUMER_KEY, CONSUMER_SECRET)
 
 twitter_api = twitter.Twitter(domain = 'api.twitter.com', api_version = '1.1', auth = auth, format = 'json')
-posts = twitter_api.statuses.user_timeline(count = '200') () #does not fetch retweeets right now, set included_rts = true if needed
+profile = twitter_api.users.show(screen_name='ellen_koenig')
+location = profile['location']
 
-print json.dumps(posts, indent = 1)
-	
-                          
+print location
