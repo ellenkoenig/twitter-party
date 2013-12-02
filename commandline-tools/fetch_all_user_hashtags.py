@@ -16,7 +16,7 @@ auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
 twitter_api = twitter.Twitter(domain = 'api.twitter.com', api_version = '1.1', auth = auth, format = 'json')
 posts = twitter_api.statuses.user_timeline(count = '200') #does not fetch retweeets right now, set included_rts = true if needed
 
-pattern = re.compile('#(\w+)')
+pattern = re.compile('(?:\\s|\\A)[##]+([A-Za-z0-9-_]+)')
 tweets = [ipost['text'] for ipost in posts] 
 
 hashtags = []
