@@ -20,10 +20,3 @@ posts = twitter_api.statuses.user_timeline(count = '200') #does not fetch retwee
 tweets = [ipost['text'] for ipost in posts] 
 
 print tweets                   
-
-# pull out hashtags as list
-#pattern = re.compile(r'#\w+') #with hash
-pattern = re.compile(r'#(\w+)') #without hash
-hashtags = [pattern.findall(tweet) for tweet in tweets]
-
-print hashtags
