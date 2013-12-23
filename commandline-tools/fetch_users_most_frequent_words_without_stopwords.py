@@ -3,6 +3,7 @@
           
 import twitter
 import os
+import nltk
 
 CONSUMER_KEY = os.environ['tw_pg_consumerkey']
 CONSUMER_SECRET = os.environ['tw_pg_consumer']
@@ -17,5 +18,12 @@ posts = twitter_api.statuses.user_timeline(count = '200') #does not fetch retwee
 
 # pull out tweets as list
 tweets = [ipost['text'] for ipost in posts] 
+words = []
+for tweet in tweets:
+	words += tweet.split()
 
-print tweets                   
+word_frequencies = nltk.FreqDist(words)
+most_frequent_words = word_frequencies.keys()
+stopwords =  set(nltk.corpus.stopwords.words('english'))
+most_frequent_words_without_stopwords  = [word for word in most_frequent_words if word.lower() not in stopwords]
+print most_frequent_words_without_stopwords[:25]
