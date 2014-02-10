@@ -28,5 +28,5 @@ stemmed_words = [myPorterStemmer.stem(word) for word in words]
 word_frequencies = nltk.FreqDist(stemmed_words)
 most_frequent_words = word_frequencies.keys()
 stopwords =  set(nltk.corpus.stopwords.words('english'))
-most_frequent_words_without_stopwords  = [word for word in most_frequent_words if (word.lower() not in stopwords) and (word[:1] not in '@#')]
+most_frequent_words_without_stopwords  = [word for word in most_frequent_words if (word.lower() not in stopwords) and (word[:1] not in '@#' and len(word) > 3)]
 print most_frequent_words_without_stopwords[:30]
