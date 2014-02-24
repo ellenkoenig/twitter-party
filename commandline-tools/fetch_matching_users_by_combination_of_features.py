@@ -11,6 +11,9 @@ import requests
 #parameters
 no_of_keywords = 15
 location_radius = "25km"
+no_of_tweets_from_user_timeline = 200
+include_rts_in_timeline = 'false'
+no_of_search_results = 100
 
 def initiate_twitter_api():
 	CONSUMER_KEY = os.environ['tw_pg_consumerkey']
@@ -27,7 +30,6 @@ def convert_city_name_to_coordinates(city):
 	latitude =  json[0]['lat']
 	longitude = json[0]['lon']
 	return [latitude, longitude]
-
 
 def fetch_user_location(twitter_api):
 	profile = twitter_api.account.verify_credentials()
@@ -46,7 +48,7 @@ def clean_word_list(words):
 
 
 def fetch_user_keywords_and_hashtags(twitter_api):
-	posts = twitter_api.statuses.user_timeline(count = '200') #does not fetch retweeets right now, set included_rts = true if needed
+	posts = twitter_api.statuses.user_timeline(count = no_of_tweets_from_user_timeline, included_rts = include_rts_in_timeline) 
 	tweets = [ipost['text'] for ipost in posts] 
 
 	pattern = re.compile('(?:\\s|\\A)[##]+([A-Za-z0-9-_]+)')
@@ -64,7 +66,7 @@ def fetch_user_keywords_and_hashtags(twitter_api):
 def fetch_search_results(twitter_api, location, keywords, hashtags):	
 	keywords_and_hashtags = set(hashtags).union(set(keywords))
 	query_string = urllib.quote_plus(" OR ".join(keywords_and_hashtags))
-	search_results = twitter_api.search.tweets(q = query_string, geocode = location + ',' + location_radius, count = 100)
+	search_results = twitter_api.search.tweets(q = query_string, geocode = location + ',' + location_radius, count = no_of_search_results)
 	return search_results['statuses']
 
 
