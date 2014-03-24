@@ -24,7 +24,7 @@ def index():
 @app.route('/login')
 def login():
     print("Started login method")
-    session['next'] = request.args.get('next') or request.referrer or None
+    session['next'] = None #request.args.get('next') or request.referrer or None
     print("next: " + session['next'])
     callback = url_for('oauth_authorized')   
     print("callback: " + callback) 
