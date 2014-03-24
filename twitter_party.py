@@ -24,11 +24,11 @@ def index():
 @app.route('/login')
 def login():
     print("Started login method")
-    session['next'] = None #request.args.get('next') or request.referrer or None
-    print("next: " + session['next'])
+    next = None #request.args.get('next') or request.referrer or None
+    print("next: " + next)
     callback = url_for('oauth_authorized')   
     print("callback: " + callback) 
-    return render_template('index.html') #twitter.authorize(callback=callback, next = session['next'])
+    return render_template('index.html') #twitter.authorize(callback=callback, next = next)
 
 
 @app.route('/results', methods = ['POST'])
