@@ -13,7 +13,7 @@ twitter = oauth.remote_app('twitter',
     request_token_url='https://api.twitter.com/oauth/request_token',
     access_token_url='https://api.twitter.com/oauth/access_token',
     authorize_url='https://api.twitter.com/oauth/authenticate',
-    consumer_key= CONSUMER_KEY,
+    consumer_keyCONSUMER_KEY,
     consumer_secret=CONSUMER_SECRET
 )
 
@@ -24,7 +24,7 @@ def index():
 @app.route('/login')
 def login():
     session['next'] = request.args.get('next') or request.referrer or None
-    callback=url_for('oauth_authorized', _external=True)    
+    callback = url_for('oauth_authorized')    
     return twitter.authorize(callback=callback, next = session['next'])
 
 
