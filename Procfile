@@ -1,1 +1,1 @@
-web: gunicorn webapp/twitter_party:app
+web: gunicorn twitter_party:app
