@@ -13,7 +13,7 @@ twitter = oauth.remote_app('twitter',
     request_token_url='https://api.twitter.com/oauth/request_token',
     access_token_url='https://api.twitter.com/oauth/access_token',
     authorize_url='https://api.twitter.com/oauth/authenticate',
-    consumer_keyCONSUMER_KEY,
+    consumer_key=CONSUMER_KEY,
     consumer_secret=CONSUMER_SECRET
 )
 
