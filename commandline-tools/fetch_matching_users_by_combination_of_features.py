@@ -33,8 +33,11 @@ def convert_city_name_to_coordinates(city):
 
 def fetch_user_location(twitter_api):
 	profile = twitter_api.account.verify_credentials()
-	coords = convert_city_name_to_coordinates(profile['location'])
-	return ",".join(coords)
+	if profile['location']:
+		coords = convert_city_name_to_coordinates(profile['location'])
+		return ",".join(coords)
+	else:
+		return None
 
 def clean_word_list(words):
 	myPorterStemmer = nltk.stem.porter.PorterStemmer()
@@ -66,8 +69,14 @@ def fetch_user_keywords_and_hashtags(twitter_api):
 def fetch_search_results(twitter_api, location, keywords, hashtags):	
 	keywords_and_hashtags = set(hashtags).union(set(keywords))
 	query_string = urllib.quote_plus(" OR ".join(keywords_and_hashtags))
-	search_results = twitter_api.search.tweets(q = query_string, geocode = location + ',' + location_radius, count = no_of_search_results)
-	return search_results['statuses']
+	if query_string:
+		if location:
+			search_results = twitter_api.search.tweets(q = query_string, geocode = location + ',' + location_radius, count = no_of_search_results)
+		else:
+			search_results = twitter_api.search.tweets(q = query_string, count = no_of_search_results)
+		return search_results['statuses']
+	else:
+		return []
 
 
 twitter_api = initiate_twitter_api()
@@ -76,6 +85,13 @@ location = fetch_user_location(twitter_api)
 search_result_tweets = fetch_search_results(twitter_api, location, keywords, hashtags)
 
 for result in search_result_tweets:
+	try:
 		print result['text']
+	except UnicodeEncodeError:
+		# temporary fix so the program runs on Windows when unicode encountered
+		print result['text'].encode('unicode_escape')
+	try:
 		print result['user']['name']
+	except UnicodeEncodeError:
+		print result['user']['name'].encode('unicode_escape')
 
