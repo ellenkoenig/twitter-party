@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, session, url_for, redirect
 from flask_oauth import OAuth
 import os
+import logging
+from logging.handlers import StreamHandler
 
 app = Flask(__name__)
 
@@ -23,7 +25,9 @@ def index():
 
 @app.route('/login')
 def login():
-    session['next'] = None #request.args.get('next') or request.referrer or None
+    app.logger.info("Started login method")
+    session['next'] = request.args.get('next') or request.referrer or None
+    app.logger.info(session['next'])
     callback = url_for('oauth_authorized')   
     app.logger.info(callback) 
     return render_template('index.html') #twitter.authorize(callback=callback, next = session['next'])
@@ -56,4 +60,7 @@ def oauth_authorized(resp):
     return redirect(next_url)
 
 if __name__ == "__main__":
+    handler = StreamHandler()
+    handler.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
     app.run(debug=True)
