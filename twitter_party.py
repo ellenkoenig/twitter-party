@@ -23,7 +23,7 @@ def index():
 
 @app.route('/login')
 def login():
-    return twitter.authorize(callback=url_for('oauth_authorized',
+    return twitter.authorize(callback=url_for('/oauth_authorized',
      	next=request.args.get('next') or request.referrer or None))
 
 
