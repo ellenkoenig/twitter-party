@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, session, url_for, redirect
 from flask_oauth import OAuth
 import os
 import logging
-from StreamHandler import StreamHandler
 
 app = Flask(__name__)
 
@@ -60,7 +59,7 @@ def oauth_authorized(resp):
     return redirect(next_url)
 
 if __name__ == "__main__":
-    handler = StreamHandler()
+    handler = logging.StreamHandler()
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
     app.run(debug=True)
