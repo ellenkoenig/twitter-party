@@ -23,9 +23,10 @@ def index():
 
 @app.route('/login')
 def login():
-    session['next'] = request.args.get('next') or request.referrer or None
-    callback = url_for('oauth_authorized')    
-    return twitter.authorize(callback=callback, next = session['next'])
+    session['next'] = None #request.args.get('next') or request.referrer or None
+    callback = url_for('oauth_authorized')   
+    app.logger.info(callback) 
+    return render_template('index.html') #twitter.authorize(callback=callback, next = session['next'])
 
 
 @app.route('/results', methods = ['POST'])
