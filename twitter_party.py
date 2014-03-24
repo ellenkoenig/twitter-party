@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, url_for, redirect
 from flask_oauth import OAuth
 import os
 import logging
-from logging.handlers import StreamHandler
+from StreamHandler import StreamHandler
 
 app = Flask(__name__)
 
