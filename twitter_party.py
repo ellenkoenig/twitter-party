@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, session, url_for
+from flask import Flask, render_template, request, session, url_for, redirect, flash
 from flask_oauth import OAuth
 import os
 
 app = Flask(__name__)
+app.secret_key="tw-party-gen"
 
 CONSUMER_KEY = os.environ['tw_pg_consumerkey'] 
 CONSUMER_SECRET = os.environ['tw_pg_consumer'] 
@@ -13,7 +14,7 @@ twitter = oauth.remote_app('twitter',
     request_token_url='https://api.twitter.com/oauth/request_token',
     access_token_url='https://api.twitter.com/oauth/access_token',
     authorize_url='https://api.twitter.com/oauth/authenticate',
-    consumer_key= CONSUMER_KEY,
+    consumer_key=CONSUMER_KEY,
     consumer_secret=CONSUMER_SECRET
 )
 
@@ -23,14 +24,11 @@ def index():
 
 @app.route('/login')
 def login():
-    return twitter.authorize(callback=url_for('/oauth_authorized',
-     	next=request.args.get('next') or request.referrer or None))
-
-
-@app.route('/results', methods = ['POST'])
-def results():
-	handle = request.form['handle']
-	return render_template('results.html', token = token)
+    if session.has_key('twitter_token'):
+        del session['twitter_token']
+    next = url_for("success")
+    callback = url_for('oauth_authorized', next = next)    
+    return twitter.authorize(callback=callback)
 
 @twitter.tokengetter
 def get_twitter_token(token=None):
@@ -52,6 +50,10 @@ def oauth_authorized(resp):
 
     flash('You were signed in as %s' % resp['screen_name'])
     return redirect(next_url)
+
+@app.route("/success")
+def success():
+    return render_template("success.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
