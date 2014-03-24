@@ -24,6 +24,7 @@ def index():
 
 @app.route('/login')
 def login():
+    print("Hello, World!")
     app.logger.info("Started login method")
     session['next'] = request.args.get('next') or request.referrer or None
     app.logger.info(session['next'])
