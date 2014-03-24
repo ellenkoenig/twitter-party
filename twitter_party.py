@@ -27,7 +27,7 @@ def login():
     session['next'] = request.args.get('next') or request.referrer or None
     print("next: " + session['next'])
     callback = url_for('oauth_authorized')   
-    print("callback: ": callback) 
+    print("callback: " + callback) 
     return render_template('index.html') #twitter.authorize(callback=callback, next = session['next'])
 
 
