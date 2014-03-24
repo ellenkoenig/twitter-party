@@ -4,8 +4,8 @@ import os
 
 app = Flask(__name__)
 
-CONSUMER_KEY = "foo" #os.environ['tw_pg_consumerkey'] 
-CONSUMER_SECRET = "bar" #os.environ['tw_pg_consumer'] 
+CONSUMER_KEY = os.environ['tw_pg_consumerkey'] 
+CONSUMER_SECRET = os.environ['tw_pg_consumer'] 
 
 oauth = OAuth()
 twitter = oauth.remote_app('twitter',
