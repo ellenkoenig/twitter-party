@@ -4,8 +4,8 @@ import os
 
 app = Flask(__name__)
 
-CONSUMER_KEY = os.environ['tw_pg_consumerkey'] 
-CONSUMER_SECRET = os.environ['tw_pg_consumer'] 
+CONSUMER_KEY = "foo" #os.environ['tw_pg_consumerkey'] 
+CONSUMER_SECRET = "bar" #os.environ['tw_pg_consumer'] 
 
 oauth = OAuth()
 twitter = oauth.remote_app('twitter',
@@ -23,12 +23,9 @@ def index():
 
 @app.route('/login')
 def login():
-    #print("Started login method")
-    next = request.args.get('next') or request.referrer or None
-    print("next: " + next)
-    callback = url_for('oauth_authorized')   
-    print("callback: " + callback) 
-    return render_template('index.html') #twitter.authorize(callback=callback, next = next)
+    next = request.args.get('next') or request.referrer or "/"
+    callback = url_for('oauth_authorized', next = next)    
+    return redirect(twitter.authorize(callback=callback))
 
 
 @app.route('/results', methods = ['POST'])
