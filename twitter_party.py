@@ -37,7 +37,6 @@ def get_twitter_token(token=None):
 @app.route('/oauth-authorized')
 @twitter.authorized_handler
 def oauth_authorized(resp):
-    print resp
     next_url = request.args.get('next') or url_for('index')
     if resp is None:
         flash(u'You denied the request to sign in.')
@@ -54,7 +53,7 @@ def oauth_authorized(resp):
 
 @app.route("/success")
 def success():
-    render_template("success.html")
+    return render_template("success.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
