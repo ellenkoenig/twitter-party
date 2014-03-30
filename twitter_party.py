@@ -24,6 +24,8 @@ def index():
 
 @app.route('/login')
 def login():
+    if session.has_key('twitter_token'):
+        del session['twitter_token']
     next = url_for("success")
     callback = url_for('oauth_authorized', next = next)    
     return twitter.authorize(callback=callback)
