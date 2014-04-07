@@ -53,6 +53,7 @@ def oauth_authorized(resp):
 
 @app.route("/success")
 def success():
+<<<<<<< HEAD
     response = twitter.get("account/verify_credentials.json")
     print(response.status)
     print session.get('twitter_token')
@@ -62,6 +63,8 @@ def success():
         location = None
         flash('Unable to load location from Twitter. Maybe out of API calls or Twitter is overloaded.')
 
+=======
+>>>>>>> fe442f1c3d79f37115a1f796e14039e37e9f56d3
     return render_template("success.html")
 
 if __name__ == "__main__":
