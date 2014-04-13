@@ -10,12 +10,14 @@ CONSUMER_SECRET = os.environ['tw_pg_consumer']
 
 oauth = OAuth()
 twitter = oauth.remote_app('twitter',
-    base_url='https://api.twitter.com/1/',
-    request_token_url='https://api.twitter.com/oauth/request_token',
-    access_token_url='https://api.twitter.com/oauth/access_token',
-    authorize_url='https://api.twitter.com/oauth/authenticate',
-    consumer_key=CONSUMER_KEY,
-    consumer_secret=CONSUMER_SECRET
+    base_url = 'https://api.twitter.com/1/',
+    request_token_url = 'https://api.twitter.com/oauth/request_token',
+    access_token_url = 'https://api.twitter.com/oauth/access_token',
+    authorize_url = 'https://api.twitter.com/oauth/authenticate',
+    consumer_key = CONSUMER_KEY,
+    consumer_secret = CONSUMER_SECRET
+    print consumer_key
+    print consumer_secret
 )
 
 @app.route('/')
