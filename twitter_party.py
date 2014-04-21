@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session, url_for, redirect, flash
 from flask_oauth import OAuth
 import os
+import twitter
 
 app = Flask(__name__)
 app.secret_key="tw-party-gen"
@@ -9,15 +10,13 @@ CONSUMER_KEY = os.environ['tw_pg_consumerkey']
 CONSUMER_SECRET = os.environ['tw_pg_consumer'] 
 
 oauth = OAuth()
-twitter = oauth.remote_app('twitter',
-    base_url = 'https://api.twitter.com/1/',
-    request_token_url = 'https://api.twitter.com/oauth/request_token',
-    access_token_url = 'https://api.twitter.com/oauth/access_token',
-    authorize_url = 'https://api.twitter.com/oauth/authenticate',
-    consumer_key = CONSUMER_KEY,
-    consumer_secret = CONSUMER_SECRET
-    print consumer_key
-    print consumer_secret
+twitter_oauth = oauth.remote_app('twitter',
+    base_url='https://api.twitter.com/1/',
+    request_token_url='https://api.twitter.com/oauth/request_token',
+    access_token_url='https://api.twitter.com/oauth/access_token',
+    authorize_url='https://api.twitter.com/oauth/authenticate',
+    consumer_key=CONSUMER_KEY,
+    consumer_secret=CONSUMER_SECRET
 )
 
 @app.route('/')
@@ -30,14 +29,14 @@ def login():
         del session['twitter_token']
     next = url_for("success")
     callback = url_for('oauth_authorized', next = next)    
-    return twitter.authorize(callback=callback)
+    return twitter_oauth.authorize(callback=callback)
 
-@twitter.tokengetter
+@twitter_oauth.tokengetter
 def get_twitter_token(token=None):
     return session.get('twitter_token')
 
 @app.route('/oauth-authorized')
-@twitter.authorized_handler
+@twitter_oauth.authorized_handler
 def oauth_authorized(resp):
     next_url = request.args.get('next') or url_for('index')
     if resp is None:
@@ -55,16 +54,12 @@ def oauth_authorized(resp):
 
 @app.route("/success")
 def success():
-    response = twitter.get("account/verify_credentials.json")
-    print(response.status)
-    print session.get('twitter_token')
-    if response.status == 200:
-        location = response.data
-    else:
-        location = None
-        flash('Unable to load location from Twitter. Maybe out of API calls or Twitter is overloaded.')
+    auth = twitter.oauth.OAuth(session['twitter_token'][0], session['twitter_token'][1],
+                           CONSUMER_KEY, CONSUMER_SECRET)
 
-    return render_template("success.html")
+    twitter_api = twitter.Twitter(domain = 'api.twitter.com', api_version = '1.1', auth = auth, format = 'json')
+    profile = twitter_api.account.verify_credentials()
+    return render_template("success.html", location = profile['location'])
 
 if __name__ == "__main__":
     app.run(debug=True)

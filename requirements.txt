@@ -7,4 +7,5 @@ gunicorn==18.0
 httplib2==0.8
 itsdangerous==0.23
 oauth2==1.5.211
+twitter==1.14.2
 wsgiref==0.1.2
