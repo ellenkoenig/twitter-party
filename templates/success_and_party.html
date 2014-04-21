@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Twitter Party Generator: Party time!</title>
+  </head>
+  <body>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+
+   Login successfully!
+
+   Your Twitter location is: {{location}}	
+
+   Your Twitter party mates are:
+<ul>
+{% for result in result_tweets %}
+<li><a href="http://twitter.com/{{ result['user']['screen_name'] }}">{{ result['user']['name'] }}</a> : {{ result['text'] }}</li>
+{% endfor %}
+</ul>
+
+  </body>
+</html>
