@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Twitter Party Generator: Login</title>
+    <title>Twitter Party Generator: Success</title>
   </head>
-
   <body>
-{% with messages = get_flashed_messages() %}
+  {% with messages = get_flashed_messages() %}
   {% if messages %}
     <ul class=flashes>
     {% for message in messages %}
@@ -14,7 +13,11 @@
     </ul>
   {% endif %}
 {% endwith %}
-  
-   <a href="/login">Log into Twitter</a>
+
+
+   Login successfully!
+
+   Your Twitter location is: {{location}}	
+
   </body>
 </html>
