@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session, url_for, redirect, f
 from flask_oauth import OAuth
 import os
 import twitter
+from fetch_matching_twitter_users import fetch_user_location, fetch_user_keywords_and_hashtags, fetch_search_results
 
 app = Flask(__name__)
 app.secret_key="tw-party-gen"
@@ -54,12 +55,14 @@ def oauth_authorized(resp):
 
 @app.route("/success")
 def success():
-    auth = twitter.oauth.OAuth(session['twitter_token'][0], session['twitter_token'][1],
-                           CONSUMER_KEY, CONSUMER_SECRET)
-
+    auth = twitter.oauth.OAuth(session['twitter_token'][0], session['twitter_token'][1], CONSUMER_KEY, CONSUMER_SECRET)
     twitter_api = twitter.Twitter(domain = 'api.twitter.com', api_version = '1.1', auth = auth, format = 'json')
-    profile = twitter_api.account.verify_credentials()
-    return render_template("success.html", location = profile['location'])
+
+    location = fetch_user_location(twitter_api)
+    (keywords, hashtags) = fetch_user_keywords_and_hashtags(twitter_api)
+    search_result_tweets = fetch_search_results(twitter_api, location, keywords, hashtags)
+
+    return render_template("success_and_party.html", location = location, result_tweets = search_result_tweets)
 
 if __name__ == "__main__":
     app.run(debug=True)
