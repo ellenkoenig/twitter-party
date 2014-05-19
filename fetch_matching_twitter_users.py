@@ -14,7 +14,7 @@ no_of_keywords = 15
 location_radius = "25km"
 no_of_tweets_from_user_timeline = 200
 include_rts_in_timeline = 'false'
-no_of_search_results = 100
+no_of_search_results = 500
 
 def convert_city_name_to_coordinates(city):
 	request = requests.get('http://nominatim.openstreetmap.org/search?q=' + city + '&format=json')
@@ -29,8 +29,9 @@ def fetch_user_location(twitter_api):
 	return ",".join(coords)
 
 def clean_word_list(words):
+	cleaned_words = clean_characters(words)
 	myPorterStemmer = nltk.stem.porter.PorterStemmer()
-	stemmed_words = [myPorterStemmer.stem(word) for word in words]
+	stemmed_words = [myPorterStemmer.stem(word) for word in cleaned_words]
 
 	word_frequencies = nltk.FreqDist(stemmed_words)
 	most_frequent_words = word_frequencies.keys()
@@ -41,9 +42,18 @@ def clean_word_list(words):
 def escape_unicode_chars(words):
 	return [word.encode('unicode_escape') for word in words]
 
-def fetch_user_keywords_and_hashtags(twitter_api):
+def remove_special_chars(words):
+	return [re.sub("[&%;]", "", word) for word in words]
+
+def clean_characters(words):
+	return remove_special_chars(escape_unicode_chars(words))
+
+def fetch_user_tweets(twitter_api):
 	posts = twitter_api.statuses.user_timeline(count = no_of_tweets_from_user_timeline, included_rts = include_rts_in_timeline) 
-	tweets = [post['text'] for post in posts] 
+	return [post['text'] for post in posts]
+
+def fetch_user_keywords_and_hashtags(twitter_api):
+	tweets = fetch_user_tweets(twitter_api) 
 
 	pattern = re.compile('(?:\\s|\\A)[##]+([A-Za-z0-9-_]+)')
 	hashtags = []
@@ -53,9 +63,8 @@ def fetch_user_keywords_and_hashtags(twitter_api):
 		matcher = pattern.search(tweet)
 		if(matcher is not None):
 			hashtags.append("#" + matcher.group(1))
-		words += tweet.split()
-
-	return (escape_unicode_chars(clean_word_list(words)), escape_unicode_chars(hashtags))
+		words += tweet.split() #this builds the word list for identifying the key words, not relevant to hashtag search
+	return (escape_unicode_chars(clean_word_list(words)), clean_characters(hashtags))
 
 def fetch_search_results(twitter_api, location, keywords, hashtags):	
 	keywords_and_hashtags = set(hashtags).union(set(keywords))

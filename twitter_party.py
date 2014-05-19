@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, session, url_for, redirect, f
 from flask_oauth import OAuth
 import os
 import twitter
-from fetch_matching_twitter_users import fetch_user_location, fetch_user_keywords_and_hashtags, fetch_search_results
+from fetch_matching_twitter_users import fetch_user_location, fetch_user_keywords_and_hashtags, fetch_search_results, fetch_user_tweets
+from compute_user_emotions import identify_emotions, filter_search_with_sentiment
 
 app = Flask(__name__)
 app.secret_key="tw-party-gen"
@@ -58,11 +59,23 @@ def success():
     auth = twitter.oauth.OAuth(session['twitter_token'][0], session['twitter_token'][1], CONSUMER_KEY, CONSUMER_SECRET)
     twitter_api = twitter.Twitter(domain = 'api.twitter.com', api_version = '1.1', auth = auth, format = 'json')
 
-    location = fetch_user_location(twitter_api)
-    (keywords, hashtags) = fetch_user_keywords_and_hashtags(twitter_api)
-    search_result_tweets = fetch_search_results(twitter_api, location, keywords, hashtags)
+    user_location = fetch_user_location(twitter_api)
+    (user_keywords, user_hashtags) = fetch_user_keywords_and_hashtags(twitter_api)
+    user_keywords_and_tags = ", ".join(set(user_keywords).union(set(user_hashtags)))
 
-    return render_template("success_and_party.html", location = location, result_tweets = search_result_tweets)
+    user_tweets = fetch_user_tweets(twitter_api)
+    user_emotions_with_frequencies = identify_emotions(user_tweets)
+    user_emotions = ", ".join(user_emotions_with_frequencies.keys())
+
+    search_result_tweets = fetch_search_results(twitter_api, user_location, user_keywords, user_hashtags)
+    results_texts = [tweet['text'] for tweet in search_result_tweets]   
+
+    party_emotions_with_frequencies = identify_emotions(results_texts)
+    party_emotions = ", ".join(party_emotions_with_frequencies.keys())
+
+    sentiment_matched_tweets = filter_search_with_sentiment(search_result_tweets, user_emotions_with_frequencies.keys())
+
+    return render_template("success_and_party.html", location = user_location, result_tweets = sentiment_matched_tweets, keywords_and_tags = user_keywords_and_tags, user_emotions = user_emotions, party_emotions = party_emotions)
 
 if __name__ == "__main__":
     app.run(debug=True)
