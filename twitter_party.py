@@ -25,8 +25,9 @@ twitter_oauth = oauth.remote_app('twitter',
 def index():
     return render_template('index.html')
 
-@app.route('/login')
+@app.route('/login', methods = ['POST'])
 def login():
+    print request.form
     if session.has_key('twitter_token'):
         del session['twitter_token']
     next = url_for("success")
