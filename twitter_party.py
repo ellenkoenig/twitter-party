@@ -2,14 +2,14 @@ from flask import Flask, render_template, request, session, url_for, redirect, f
 from flask_oauth import OAuth
 import os
 import twitter
-from fetch_matching_twitter_users import fetch_user_location, fetch_user_keywords_and_hashtags, fetch_search_results, fetch_user_tweets
+from fetch_matching_twitter_users import TwitterBot #fetch_user_location, fetch_user_keywords_and_hashtags, fetch_search_results, fetch_user_tweets
 from compute_user_emotions import identify_emotions, filter_search_with_sentiment
 
 app = Flask(__name__)
 app.secret_key="tw-party-gen"
 
 CONSUMER_KEY = os.environ['tw_pg_consumerkey'] 
-CONSUMER_SECRET = os.environ['tw_pg_consumer'] 
+CONSUMER_SECRET = os.environ['tw_pg_consumer']
 
 oauth = OAuth()
 twitter_oauth = oauth.remote_app('twitter',
@@ -27,7 +27,7 @@ def index():
 
 @app.route('/login', methods = ['POST'])
 def login():
-    print request.form
+    session['params'] = request.form
     if session.has_key('twitter_token'):
         del session['twitter_token']
     next = url_for("success")
@@ -59,24 +59,27 @@ def oauth_authorized(resp):
 def success():
     auth = twitter.oauth.OAuth(session['twitter_token'][0], session['twitter_token'][1], CONSUMER_KEY, CONSUMER_SECRET)
     twitter_api = twitter.Twitter(domain = 'api.twitter.com', api_version = '1.1', auth = auth, format = 'json')
+    twitter_bot = TwitterBot(twitter_api, './nltk_data/', session['params']['no_of_keywords'], session['params']['location_radius'], session['params']['no_of_tweets_from_user_timeline'], session['params']['include_rts_in_timeline'], session['params']['no_of_search_results'])
 
-    user_location = fetch_user_location(twitter_api)
-    (user_keywords, user_hashtags) = fetch_user_keywords_and_hashtags(twitter_api)
+    user_location = twitter_bot.fetch_user_location()
+    (user_keywords, user_hashtags) = twitter_bot.fetch_user_keywords_and_hashtags()
     user_keywords_and_tags = ", ".join(set(user_keywords).union(set(user_hashtags)))
 
-    user_tweets = fetch_user_tweets(twitter_api)
-    user_emotions_with_frequencies = identify_emotions(user_tweets)
-    user_emotions = ", ".join(user_emotions_with_frequencies.keys())
+    user_tweets = twitter_bot.fetch_user_tweets()
 
-    search_result_tweets = fetch_search_results(twitter_api, user_location, user_keywords, user_hashtags)
+    search_result_tweets = twitter_bot.fetch_search_results(user_location, user_keywords, user_hashtags)
     results_texts = [tweet['text'] for tweet in search_result_tweets]   
 
-    party_emotions_with_frequencies = identify_emotions(results_texts)
-    party_emotions = ", ".join(party_emotions_with_frequencies.keys())
+    if(session['params']['perform_sentiment_analysis']== u'yes'):
+        user_emotions_with_frequencies = identify_emotions(user_tweets)
+        user_emotions = ", ".join(user_emotions_with_frequencies.keys())
 
-    sentiment_matched_tweets = filter_search_with_sentiment(search_result_tweets, user_emotions_with_frequencies.keys())
-
-    return render_template("success_and_party.html", location = user_location, result_tweets = sentiment_matched_tweets, keywords_and_tags = user_keywords_and_tags, user_emotions = user_emotions, party_emotions = party_emotions)
+        party_emotions_with_frequencies = identify_emotions(results_texts)
+        party_emotions = ", ".join(party_emotions_with_frequencies.keys())
+        sentiment_matched_tweets = filter_search_with_sentiment(search_result_tweets, user_emotions_with_frequencies.keys())
+        return render_template("success_and_party.html", location = user_location, result_tweets = sentiment_matched_tweets, keywords_and_tags = user_keywords_and_tags, user_emotions = user_emotions, party_emotions = party_emotions)
+    else:
+        return render_template("success_and_party.html", location = user_location, result_tweets = search_result_tweets, keywords_and_tags = user_keywords_and_tags, user_emotions = None, party_emotions = None)
 
 if __name__ == "__main__":
     app.run(debug=True)

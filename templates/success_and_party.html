@@ -21,9 +21,10 @@
 
    Your most common keywords (stemmed) and hashtags are: {{keywords_and_tags}} <br>
 
-   Your most common emotions expressed in tweets are {{user_emotions}} <br>
-
-   The most common emotions expressed in your party mates' tweets are: {{party_emotions}} <br>
+  {% if user_emotions %}
+    Your most common emotions expressed in tweets are {{user_emotions}} <br>
+    The most common emotions expressed in your party mates' tweets are: {{party_emotions}} <br>
+  {% endif %}
 
    Your Twitter party mates are:
 <ul>

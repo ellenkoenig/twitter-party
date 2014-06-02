@@ -18,10 +18,10 @@
     <form action="/login" method="post">
       Fetch <input type="text" name="no_of_tweets_from_user_timeline" value="100" /> tweets from my time line. <br>
 	  Use the <input type="text" name="no_of_keywords" value="15" /> most frequent keywords in my tweets. <br>
-	  Include retweets: <input type="radio" name="include_rts_in_timeline" value="yes" /> yes <input type="radio" name="include_rts_in_timeline" value="no" /> no <br>
+	  Include retweets: <input type="radio" name="include_rts_in_timeline" value="yes" /> yes <input type="radio" name="include_rts_in_timeline" value="no" checked="checked"/> no <br>
 	  Fetch tweets by users located in <input type="text" name="location_radius" value="25km" /> around me. <br>
 	  Analyze <input type="text" name="no_of_search_results" value="200"/> search results to find my party mates. <br>
-	  Find only users with moods that match mine: <input type="radio" name="perform_sentiment_analysis" value="yes" /> yes <input type="radio" name="perform_sentiment_analysis" value="no" /> no <br>
+	  Find only users with moods that match mine: <input type="radio" name="perform_sentiment_analysis" value="yes" checked="checked" /> yes <input type="radio" name="perform_sentiment_analysis" value="no" /> no <br>
 	  <input type="submit" value="Log into Twitter" />
 	</form>
 
