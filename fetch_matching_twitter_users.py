@@ -85,6 +85,7 @@ class TwitterBot(object):
 				hashtags.append("#" + matcher.group(1))
 			words += tweet.split() #this builds the word list for identifying the key words, not relevant to hashtag search
 		dict_words_freq = self.clean_word_list(words)
+		hashtags = set(hashtags)
 		return (self.escape_unicode_chars(dict_words_freq.keys()), self.clean_characters(hashtags),dict_words_freq)
 
 	def fetch_search_results(self, location, keywords, hashtags):	
