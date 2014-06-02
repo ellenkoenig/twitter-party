@@ -65,6 +65,11 @@ class TwitterBot(object):
 
 	def fetch_user_tweets(self):
 		posts = self.twitter_api.statuses.user_timeline(count = self.no_of_tweets_from_user_timeline, included_rts = self.include_rts_in_timeline) 
+		while(len(posts) < self.no_of_tweets_from_user_timeline): #we need to fetch more pages to reach the no that the user requested
+			ids = [int(post["id"]) for post in posts]
+			max_id = max(ids) - 1
+			posts += self.twitter_api.statuses.user_timeline(count = self.no_of_tweets_from_user_timeline, included_rts = self.include_rts_in_timeline, max_id = max_id)			
+
 		return [post['text'] for post in posts]
 
 	def fetch_user_keywords_and_hashtags(self):
@@ -86,4 +91,11 @@ class TwitterBot(object):
 		keywords_and_hashtags = set(hashtags).union(set(keywords))
 		query_string = urllib.quote_plus(" OR ".join(keywords_and_hashtags))
 		search_results = self.twitter_api.search.tweets(q = query_string, geocode = location + ',' + self.location_radius, count = self.no_of_search_results)
-		return search_results['statuses']
+		statuses = search_results['statuses']
+		while(len(statuses) < self.no_of_search_results): #we need to fetch more pages to reach the no that the user requested
+			ids = [int(status['id']) for status in statuses]
+			max_id = max(ids) - 1
+			results = self.twitter_api.search.tweets(q = query_string, geocode = location + ',' + self.location_radius, count = self.no_of_search_results, max_id = max_id)			
+			statuses += results['statuses']
+
+		return statuses
