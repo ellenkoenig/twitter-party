@@ -61,8 +61,8 @@ def success():
     twitter_api = twitter.Twitter(domain = 'api.twitter.com', api_version = '1.1', auth = auth, format = 'json')
 
     user_location = fetch_user_location(twitter_api)
-    (user_keywords, user_hashtags) = fetch_user_keywords_and_hashtags(twitter_api)
-    user_keywords_and_tags = ", ".join(set(user_keywords).union(set(user_hashtags)))
+    (user_keywords, user_hashtags, keyword_freq) = fetch_user_keywords_and_hashtags(twitter_api)
+    hashtags = ", ".join(user_hashtags)
 
     user_tweets = fetch_user_tweets(twitter_api)
     user_emotions_with_frequencies = identify_emotions(user_tweets)
@@ -76,7 +76,7 @@ def success():
 
     sentiment_matched_tweets = filter_search_with_sentiment(search_result_tweets, user_emotions_with_frequencies.keys())
 
-    return render_template("success_and_party.html", location = user_location, result_tweets = sentiment_matched_tweets, keywords_and_tags = user_keywords_and_tags, user_emotions = user_emotions, party_emotions = party_emotions)
+    return render_template("success_and_party.html", location = user_location, result_tweets = sentiment_matched_tweets, keywords = user_keywords, kw_freq = keyword_freq, hashtags = hashtags, user_emotions = user_emotions, party_emotions = party_emotions)
 
 if __name__ == "__main__":
     app.run(debug=True)
