@@ -37,17 +37,28 @@ class TwitterBot(object):
 		myPorterStemmer = nltk.stem.porter.PorterStemmer()
 		stemmed_words = [myPorterStemmer.stem(word) for word in cleaned_words]
 
-		word_frequencies = nltk.FreqDist(stemmed_words)
-		most_frequent_words = word_frequencies.keys()
 		stopwords = set(nltk.corpus.stopwords.words('english'))
-		most_frequent_words_without_stopwords  = [word for word in most_frequent_words if (word.lower() not in stopwords) and (word[:1] not in '@#' and len(word) > 3)]
-		return most_frequent_words_without_stopwords[:self.no_of_keywords]
+		words_without_stopwords  = [word for word in cleaned_words if (word.lower() not in stopwords) and (word[:1] not in '@#' and word[:4] != 'http' and len(word) > 3)]
+
+		myPorterStemmer = nltk.stem.porter.PorterStemmer()
+		stemmed_words = [myPorterStemmer.stem(word) for word in words_without_stopwords]
+
+		word_frequencies = nltk.FreqDist(stemmed_words)
+		most_frequent_words = word_frequencies.keys()[:self.no_of_keywords]
+		frequencies = [word_frequencies[word] for word in most_frequent_words]
+		# normalize frequency values so largest value is 300 and lowest 100
+		max_freq = max(frequencies)
+		min_freq = min(frequencies)
+		max_val = 300
+		min_val = 100
+		norm_freq = [(freq-min_freq)/(max_freq-min_freq)*(max_val - min_val) + min_val for freq in frequencies]
+		return dict(zip(most_frequent_words,norm_freq))
 
 	def escape_unicode_chars(self, words):
 		return [word.encode('unicode_escape') for word in words]
 
 	def remove_special_chars(self, words):
-		return [re.sub("[&%;]", "", word) for word in words]
+		return [re.sub("[&%;:\(\)!\.,\?\+\*-=]", "", word) for word in words]
 
 	def clean_characters(self, words):
 		return self.remove_special_chars(self.escape_unicode_chars(words))
@@ -68,7 +79,8 @@ class TwitterBot(object):
 			if(matcher is not None):
 				hashtags.append("#" + matcher.group(1))
 			words += tweet.split() #this builds the word list for identifying the key words, not relevant to hashtag search
-		return (self.escape_unicode_chars(self.clean_word_list(words)), self.clean_characters(hashtags))
+		dict_words_freq = self.clean_word_list(words)
+		return (self.escape_unicode_chars(dict_words_freq.keys()), self.clean_characters(hashtags),dict_words_freq)
 
 	def fetch_search_results(self, location, keywords, hashtags):	
 		keywords_and_hashtags = set(hashtags).union(set(keywords))

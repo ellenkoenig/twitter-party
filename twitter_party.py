@@ -62,8 +62,8 @@ def success():
     twitter_bot = TwitterBot(twitter_api, './nltk_data/', session['params']['no_of_keywords'], session['params']['location_radius'], session['params']['no_of_tweets_from_user_timeline'], session['params']['include_rts_in_timeline'], session['params']['no_of_search_results'])
 
     user_location = twitter_bot.fetch_user_location()
-    (user_keywords, user_hashtags) = twitter_bot.fetch_user_keywords_and_hashtags()
-    user_keywords_and_tags = ", ".join(set(user_keywords).union(set(user_hashtags)))
+    (user_keywords, user_hashtags, keyword_freq) = twitter_bot.fetch_user_keywords_and_hashtags()
+    hashtags = ", ".join(user_hashtags)
 
     user_tweets = twitter_bot.fetch_user_tweets()
 
@@ -77,9 +77,9 @@ def success():
         party_emotions_with_frequencies = identify_emotions(results_texts)
         party_emotions = ", ".join(party_emotions_with_frequencies.keys())
         sentiment_matched_tweets = filter_search_with_sentiment(search_result_tweets, user_emotions_with_frequencies.keys())
-        return render_template("success_and_party.html", location = user_location, result_tweets = sentiment_matched_tweets, keywords_and_tags = user_keywords_and_tags, user_emotions = user_emotions, party_emotions = party_emotions)
+        return render_template("success_and_party.html", location = user_location, result_tweets = sentiment_matched_tweets, keywords = user_keywords, kw_freq = keyword_freq, hashtags = hashtags, user_emotions = user_emotions, party_emotions = party_emotions)
     else:
-        return render_template("success_and_party.html", location = user_location, result_tweets = search_result_tweets, keywords_and_tags = user_keywords_and_tags, user_emotions = None, party_emotions = None)
+        return render_template("success_and_party.html", location = user_location, result_tweets = search_result_tweets, keywords = user_keywords, kw_freq = keyword_freq, hashtags = hashtags, user_emotions = None, party_emotions = None)
 
 if __name__ == "__main__":
     app.run(debug=True)

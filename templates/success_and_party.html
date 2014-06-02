@@ -15,11 +15,17 @@
 {% endwith %}
 
 
-   Login successfully!
+   Login successful!
 
    Your Twitter location is: {{location}}	<br>
 
-   Your most common keywords (stemmed) and hashtags are: {{keywords_and_tags}} <br>
+   Your most common keywords (stemmed) and hashtags are: <br>
+   {% for kw in keywords %}
+   <span style="font-size: {{ kw_freq[kw] }}% ;">{{ kw }}</span>,  
+   {% endfor %}
+   <br>
+   {{ hashtags }} <br>
+   <br>
 
   {% if user_emotions %}
     Your most common emotions expressed in tweets are {{user_emotions}} <br>
